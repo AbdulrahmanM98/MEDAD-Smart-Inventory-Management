@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>مِداد | MEDAD — ASQ Smart Inventory Intelligence</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/reports.css" />
+  <link rel="stylesheet" href="/supply.css" />
+  <link rel="stylesheet" href="/brand-theme.css?v=20261103-midad" />
+  <link rel="icon" type="image/png" href="/asq-logo.png" />
+</head>
+<body class="auth-locked">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img class="brand-mark asq-logo" src="/asq-logo.png" alt="مِداد | MEDAD logo" width="48" height="48" />
+        <div>
+          <div class="brand-name app-wordmark" dir="ltr"><bdi lang="ar">مِداد</bdi><span aria-hidden="true">|</span><bdi lang="en">MEDAD</bdi></div><div class="brand-sub" dir="ltr">ASQ Smart Inventory Intelligence</div>
+          
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">◫</span><span>Overview</span>
+        </button>
+        <button class="nav-item" data-view="inventory">
+          <span class="nav-icon">▦</span><span>Inventory</span>
+        </button>
+        <button class="nav-item" data-view="transfers">
+          <span class="nav-icon">⇄</span><span>Transfers</span>
+        </button>
+        <button class="nav-item" data-view="warehouse">
+          <span class="nav-icon">▤</span><span>Warehouse</span>
+        </button>
+        <button class="nav-item" data-view="alerts"><span class="nav-icon">!</span><span>Alerts <b id="alertBadge" class="nav-badge">0</b></span></button>
+        <button class="nav-item" data-view="reports"><span class="nav-icon">▥</span><span>Reports</span></button>
+        <button class="nav-item" data-view="supply" id="supplyNav"><span class="nav-icon">⇣</span><span>Supply Planning</span></button>
+        <button class="nav-item" data-view="performance"><span class="nav-icon">↗</span><span>Performance</span></button>
+        <button class="nav-item" data-view="accounts" id="accountsNav" hidden><span class="nav-icon">♙</span><span>Accounts</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-pill">
+          <span class="live-dot"></span>
+          <span id="apiLabel">Checking API...</span>
+        </div>
+        <div class="sidebar-note" id="currentAccount">Signed out</div><button class="text-btn signout-btn" id="signOutBtn" title="Sign out" aria-label="Sign out" hidden>Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">SMART REPLENISHMENT</p>
+          <h1 id="pageTitle">Inventory Command Center</h1>
+        </div>
+        <div class="topbar-actions">
+          <label id="languageControl" class="language-control" hidden><span>اللغة / Language</span><select id="languageSelect" class="control" aria-label="اللغة / Language"><option value="en">English</option><option value="ar">العربية</option></select></label>
+          <div class="last-updated">Updated <span id="lastUpdated">—</span></div>
+          <button class="btn btn-secondary" id="refreshBtn">Refresh data</button>
+          <button class="btn btn-primary" id="newTransferBtn">+ New transfer</button>
+        </div>
+      </header>
+      <section id="view-supply" class="view"><div id="supplyRoot"></div></section>
+
+      <section id="view-dashboard" class="view active">
+        <div class="kpi-grid">
+          <article class="kpi-card">
+            <div class="kpi-label">Branches</div>
+            <div class="kpi-value" id="kpiBranches">—</div>
+            <div class="kpi-foot">Active retail locations</div>
+          </article>
+          <article class="kpi-card">
+            <div class="kpi-label">Products</div>
+            <div class="kpi-value" id="kpiProducts">—</div>
+            <div class="kpi-foot">Tracked SKUs</div>
+          </article>
+          <article class="kpi-card danger-card">
+            <div class="kpi-label">Critical / OOS</div>
+            <div class="kpi-value" id="kpiCritical">—</div>
+            <div class="kpi-foot">Needs immediate attention</div>
+          </article>
+          <article class="kpi-card warning-card">
+            <div class="kpi-label">At Risk</div>
+            <div class="kpi-value" id="kpiRisk">—</div>
+            <div class="kpi-foot">Low + critical stock</div>
+          </article>
+          <article class="kpi-card accent-card">
+            <div class="kpi-label">Pending Transfers</div>
+            <div class="kpi-value" id="kpiPending">—</div>
+            <div class="kpi-foot">Awaiting warehouse action</div>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">NETWORK HEALTH</p>
+                <h2>Stock status distribution</h2>
+              </div>
+            </div>
+            <div class="health-wrap">
+              <div class="donut" id="healthDonut">
+                <div class="donut-center">
+                  <strong id="healthTotal">—</strong>
+                  <span>SKU locations</span>
+                </div>
+              </div>
+              <div class="legend" id="healthLegend"></div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">BRANCH PRIORITY</p>
+                <h2>Highest stock risk</h2>
+              </div>
+              <button class="text-btn" data-goto="inventory">Open inventory →</button>
+            </div>
+            <div id="branchRiskBars" class="risk-bars"></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">ACTION QUEUE</p>
+              <h2>Critical inventory items</h2>
+            </div>
+            <button class="text-btn" data-goto="inventory">View all inventory →</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Branch</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>Days cover</th>
+                  <th>Status</th>
+                  <th>Suggested</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="criticalTable"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">DELIVERIES</p>
+              <h2>Recent branch deliveries</h2>
+              <p class="panel-sub">Sorted by actual received time — newest first</p>
+            </div>
+            <button class="text-btn" data-goto="transfers">Open transfers →</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Request</th>
+                  <th>Branch</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Delivered at</th>
+                </tr>
+              </thead>
+              <tbody id="recentDeliveriesTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="view-inventory" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">LIVE INVENTORY</p>
+              <h2>Branch inventory health</h2>
+            </div>
+            <div class="inventory-count" id="inventoryCount">—</div>
+          </div>
+
+          <div class="filters">
+            <input id="inventorySearch" class="control" placeholder="Search product..." />
+<input
+  id="branchSearch"
+  class="control"
+  placeholder="Search branch..."
+/>
+            <select id="branchFilter" class="control"><option value="All">All branches</option></select>
+            <select id="categoryFilter" class="control"><option value="All">All categories</option></select>
+            <select id="statusFilter" class="control">
+              <option value="All">All statuses</option>
+              <option>Out of Stock</option>
+              <option>Critical</option>
+              <option>Low</option>
+              <option>Healthy</option>
+              <option>Overstock</option>
+              <option>No Demand</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Branch</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Stock</th>
+                  <th>30D sales</th>
+                  <th>Avg/day</th>
+                  <th>Days cover</th>
+                  <th>Reorder point</th>
+                  <th>Status</th>
+                  <th>Suggested</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTable"></tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <button class="btn btn-secondary" id="prevPage">← Previous</button>
+            <span id="pageInfo">Page 1</span>
+            <button class="btn btn-secondary" id="nextPage">Next →</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="view-transfers" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">REPLENISHMENT WORKFLOW</p>
+              <h2>Transfer requests</h2>
+              <p class="panel-sub">Every status change is recorded in the request timeline.</p>
+            </div>
+            <select id="transferStatusFilter" class="control compact-control">
+              <option value="All">All statuses</option>
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Shipped</option>
+              <option>Received</option>
+              <option>Rejected</option>
+              <option>Cancelled</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+  <tr>
+    <th>Request</th>
+    <th>Created</th>
+    <th>Branch</th>
+    <th>Items</th>
+    <th>Total Units</th>
+    <th>Priority</th>
+    <th>Status</th>
+    <th>Last update</th>
+    <th>Details</th>
+  </tr>
+</thead>
+              <tbody id="transfersTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="view-warehouse" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">CENTRAL WAREHOUSE</p>
+              <h2>Available stock by product</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Current</th>
+                  <th>Reserved</th>
+                  <th>Available</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="warehouseTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+      <section id="view-alerts" class="view">
+        <div class="kpi-grid operations-kpis">
+          <article class="kpi-card danger-card"><div class="kpi-label">Critical stock alerts</div><div class="kpi-value" id="alertCritical">—</div></article>
+          <article class="kpi-card warning-card"><div class="kpi-label">Warnings</div><div class="kpi-value" id="alertWarnings">—</div></article>
+          <article class="kpi-card"><div class="kpi-label">Overdue transfers</div><div class="kpi-value" id="alertOverdue">—</div></article>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><div><p class="panel-kicker">ACTION CENTER</p><h2>Prioritized alerts</h2><p class="panel-sub">Refreshes every minute while signed in. Open a stock alert to review its replenishment recommendation.</p></div><span id="alertCount" class="inventory-count"></span></div>
+          <div class="filters alert-filters">
+            <input id="alertSearch" class="control" aria-label="Search alerts" placeholder="Search product, branch or request">
+            <select id="alertBranch" class="control" aria-label="Alert branch"><option value="All">All branches</option></select>
+            <select id="alertSeverity" class="control" aria-label="Alert severity"><option value="All">All priorities</option><option value="critical">Critical</option><option value="warning">Warning</option></select>
+            <select id="alertKind" class="control" aria-label="Alert type"><option value="All">All alert types</option><option value="stock">Stock</option><option value="transfer">Overdue transfer</option></select>
+          </div>
+          <div id="alertsList" class="alert-list"></div>
+          <div class="pagination"><button id="alertPrev" class="btn btn-secondary">← Previous</button><span id="alertPageInfo"></span><button id="alertNext" class="btn btn-secondary">Next →</button></div>
+        </article>
+      </section>
+      <section id="view-performance" class="view">
+        <div class="kpi-grid operations-kpis">
+          <article class="kpi-card"><div class="kpi-label">Product availability</div><div class="kpi-value" id="metricAvailability">—</div><div class="kpi-foot">SKU locations with positive stock</div></article>
+          <article class="kpi-card"><div class="kpi-label">Average delivery</div><div class="kpi-value" id="metricDelivery">—</div><div class="kpi-foot">Creation to actual receipt</div></article>
+          <article class="kpi-card accent-card"><div class="kpi-label">On-time delivery</div><div class="kpi-value" id="metricOnTime">—</div><div class="kpi-foot">Received within 3 days</div></article>
+          <article class="kpi-card warning-card"><div class="kpi-label">Overdue requests</div><div class="kpi-value" id="metricOverdue">—</div><div class="kpi-foot">Open for more than 3 days</div></article>
+        </div>
+        <article class="panel"><h2>Availability by branch</h2><p id="metricSample" class="panel-sub"></p><div class="table-wrap metric-table"><table><thead><tr><th>Branch</th><th>In stock / Total</th><th>Availability</th><th>At risk</th></tr></thead><tbody id="metricsBranches"></tbody></table></div></article>
+        <article class="panel"><h2>Delayed transfers</h2><div id="metricsOverdue" class="alert-list"></div></article>
+      </section>
+      <section id="view-accounts" class="view">
+        <article class="panel"><p class="panel-kicker">BRANCH TRANSFER POLICY</p><h2>Source branch protection</h2><p class="panel-sub">Branch-to-branch transfers are available to administrators only and within the same city. The source always keeps its safety stock plus the configured days of recent demand.</p>
+          <form id="transferPolicyForm" class="account-form"><label>Source coverage (days)<input id="sourceRetentionDays" type="number" min="1" max="30" step="1" value="7" required class="control"></label><button type="submit" class="btn btn-primary">Save transfer policy</button></form><p id="transferPolicyMessage" class="form-message" role="status"></p>
+        </article>
+        <article class="panel"><p class="panel-kicker">ACCESS CONTROL</p><h2>Create an account</h2><p class="panel-sub">Approver approves requests; warehouse ships; branch manager requests and receives for one branch; viewer can read only.</p>
+          <form id="accountForm" class="account-form">
+            <label>Name<input id="accountName" class="control" required maxlength="80" autocomplete="off"></label>
+            <label>Email<input id="accountEmail" class="control" type="email" required autocomplete="off"></label>
+            <label>Initial password<input id="accountPassword" class="control" type="password" minlength="12" maxlength="128" required autocomplete="new-password"></label>
+            <label>Role<select id="accountRole" class="control"><option value="viewer">Viewer</option><option value="branch_manager">Branch manager</option><option value="approver">Approver</option><option value="warehouse">Warehouse</option><option value="admin">Administrator</option></select></label>
+            <label id="accountBranchLabel" hidden>Assigned branch<select id="accountBranch" class="control"></select></label>
+            <button class="btn btn-primary" type="submit">Create account</button>
+          </form>
+          <p id="accountFormMessage" class="form-message" role="status"></p>
+        </article>
+        <article class="panel"><h2>Accounts</h2><div class="table-wrap metric-table"><table><thead><tr><th>Name / Email</th><th>Role</th><th>Branch</th><th>Status</th><th>Action</th></tr></thead><tbody id="accountsTable"></tbody></table></div></article>
+      </section>
+      <section id="view-reports" class="view"><div id="reportRoot" class="reports-page" data-no-translate></div></section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="transferModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <p class="panel-kicker">NEW REQUEST</p>
+          <h2>Create stock transfer</h2>
+        </div>
+        <button class="icon-btn" id="closeModal">×</button>
+      </div>
+
+<form id="transferForm">
+  <div class="form-row">
+    <label>Transfer type<select id="transferType" class="control"><option>Warehouse Replenishment</option><option>Branch Transfer</option></select></label>
+    <label id="transferSourceLabel" hidden>Source branch<select id="transferSource" class="control"></select></label>
+  </div>
+  <p id="transferSourceHint" class="panel-sub">Warehouse stock will be reserved on approval.</p>
+
+  <div class="form-row">
+    <label>
+      Destination Branch
+      <select id="transferBranch" class="control" required>
+      </select>
+    </label>
+
+    <label>
+      Priority
+      <select id="transferPriority" class="control">
+        <option value="Normal">Normal</option>
+        <option value="High" selected>High</option>
+        <option value="Critical">Critical</option>
+      </select>
+    </label>
+  </div>
+
+
+  <div class="transfer-items-section">
+
+    <div class="transfer-items-header">
+      <div>
+        <strong>Transfer Items</strong>
+        <span>Add one or more products</span>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        id="addTransferItem"
+      >
+        + Add item
+      </button>
+    </div>
+
+
+    <div id="transferItems">
+
+      <div class="transfer-item-row">
+
+        <label>
+          Product
+          <select class="control transfer-item-product" required>
+          </select>
+        </label>
+
+        <label>
+          Quantity
+          <input
+            type="number"
+            class="control transfer-item-qty"
+            min="1"
+            value="1"
+            required
+          >
+        </label>
+
+        <button
+          type="button"
+          class="remove-transfer-item"
+          title="Remove item"
+        >
+          ×
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="transfer-draft-summary">
+
+    <div>
+      <span>Items</span>
+      <strong id="transferItemCount">1</strong>
+    </div>
+
+    <div>
+      <span>Total Quantities</span>
+      <strong id="transferTotalUnits">1</strong>
+    </div>
+
+  </div>
+
+
+  <div class="modal-actions">
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="cancelModal"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+    >
+      Create Transfer
+    </button>
+
+  </div>
+
+</form>    </div>
+  </div>
+
+  <div class="modal-backdrop" id="historyModal">
+    <div class="modal history-modal">
+      <div class="modal-head">
+        <div>
+          <p class="panel-kicker">AUDIT TRAIL</p>
+          <h2 id="historyTitle">Transfer history</h2>
+          <p class="panel-sub">Times shown in Saudi Arabia time (GMT+3).</p>
+        </div>
+        <button class="icon-btn" id="closeHistoryModal">×</button>
+      </div>
+      <div id="historyTimeline" class="timeline"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+<div class="modal-backdrop" id="productInsightsModal">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <div>
+        <p class="panel-kicker">PRODUCT INSIGHTS</p>
+
+        <h2 id="productInsightsTitle">
+          Product Insights
+        </h2>
+
+        <p
+          class="panel-sub"
+          id="productInsightsSubtitle"
+        >
+        </p>
+      </div>
+
+
+      <button
+        class="icon-btn"
+        type="button"
+        aria-label="Close Product Insights"
+        id="closeProductInsights"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div id="productInsightsContent">
+
+      <div class="empty-state">
+        Loading product insights...
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+  <div id="authModal" class="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <section class="auth-card"><img class="brand-mark asq-logo" src="/asq-logo.png" alt="مِداد | MEDAD logo" width="64" height="64" /><p class="auth-wordmark app-wordmark" dir="ltr"><bdi lang="ar">مِداد</bdi><span aria-hidden="true">|</span><bdi lang="en">MEDAD</bdi></p><p class="auth-brand-sub" dir="ltr">ASQ Smart Inventory Intelligence</p><h1 id="authTitle">Sign in</h1><p id="authDescription" class="panel-sub">Use your account.</p>
+      <form id="authForm">
+        <label id="authNameLabel" hidden>Name<input id="authName" class="control" maxlength="80" autocomplete="name"></label>
+        <label>Email<input id="authEmail" class="control" type="email" required autocomplete="username"></label>
+        <label>Password<input id="authPassword" class="control" type="password" required maxlength="128" autocomplete="current-password"></label>
+        <p id="authError" class="form-message" role="alert"></p><button id="authSubmit" class="btn btn-primary" type="submit">Sign in</button>
+      </form>
+    </section>
+  </div>
+  <script src="/i18n.js"></script>
+  <script src="/weight-ui.js"></script>
+  <script src="/app.js"></script>
+  <script src="/operations.js"></script>
+  <script src="/reports.js"></script>
+  <script src="/supply.js"></script>
+</body>
+</html>

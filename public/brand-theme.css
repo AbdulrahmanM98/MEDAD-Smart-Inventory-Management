@@ -1,0 +1,85 @@
+/* Exact brand tokens and original logo from the ASQ IT Service Desk project. */
+:root {
+  --navy: #122743;
+  --navy2: #1b385b;
+  --gold: #c7a65b;
+  --gold-light: #f3ecd9;
+  --text: #19283b;
+  --muted: #718096;
+  --line: #e5e9ef;
+  --bg: #f4f6f9;
+  --panel: #ffffff;
+  --blue: #386894;
+  --green: #2d806a;
+  --red: #b34d4d;
+  --amber: var(--gold);
+  --amber-soft: #fbf2dc;
+  --teal: var(--gold);
+  --teal-dark: var(--navy);
+  --teal-soft: var(--gold-light);
+  --shadow: 0 8px 24px #102b4e0c;
+}
+body { font-family: "Segoe UI", Arial, sans-serif; }
+.sidebar { background: var(--navy); border-inline-end: 1px solid var(--navy2); scrollbar-color: var(--blue) transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--blue); }
+.brand { border-bottom: 1px solid #ffffff22; margin-bottom: 16px; }
+.asq-logo.brand-mark { display: block; width: 48px; height: 48px; flex: 0 0 auto; object-fit: contain; background: white; border-radius: 9px; padding: 2px; box-shadow: none; }
+.brand-name { color: #fff; }
+.brand-sub, .sidebar-note { color: #dbe3ec; }
+.nav-item { color: #dbe3ec; }
+.nav-item:hover { background: #ffffff0d; }
+.nav-item.active { background: #c7a65b20; color: #fff; box-shadow: inset 3px 0 0 var(--gold); }
+html[dir="rtl"] .nav-item.active { box-shadow: inset -3px 0 0 var(--gold); }
+.nav-item.active .nav-icon { color: var(--gold); }
+.signout-btn { color: var(--gold-light); }
+.btn-primary { background: var(--gold); color: #172a40; }
+.btn-primary:hover { background: #b89549; }
+.btn-secondary { color: var(--navy); background: #fff; border-color: var(--line); }
+.btn-secondary:hover { background: #faf9f5; border-color: var(--gold); }
+.eyebrow, .panel-kicker { color: var(--blue); }
+.accent-card { border-top-color: var(--gold); }
+.control:focus, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #38689455; outline-offset: 2px; border-color: #7c9bb8; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.badge-blue { color: var(--blue); background: #e9f2f8; }
+.badge-green { color: var(--green); }
+.badge-red { color: var(--red); }
+.badge-amber { color: #886922; }
+.recommendation-card, .report-chip { border-color: #e5d8b7; }
+.recommendation-card, .report-insight, .supply-note { background: var(--gold-light); }
+.report-presets button.active { background: var(--gold-light); border-color: var(--gold); color: var(--navy); }
+.report-bar-fill { background: var(--blue); }
+.report-branches .report-bar-fill { background: var(--navy2); }
+.report-branches .selected .report-bar-fill, .report-share i { background: var(--gold); }
+.report-bar-track { background: #edf1f5; }
+.report-legend i { border-color: var(--blue); }
+.report-legend .previous { border-color: var(--gold); }
+.report-chart path[stroke="#0e9f8b"] { stroke: var(--blue); }
+.report-chart path[stroke="#8b9ab1"] { stroke: var(--gold); }
+.report-chart rect[fill="#0e9f8b"] { fill: var(--blue); }
+.report-chart rect[fill="#8b9ab1"] { fill: var(--gold); }
+.report-chart .report-hit:hover, .report-chart .report-hit:focus { fill: var(--blue); }
+.supply-status { background: #e9f2f8; color: var(--navy); }
+.auth-overlay { background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%); }
+.auth-card { border-top: 4px solid var(--gold); box-shadow: 0 18px 52px #102b4e24; }
+.auth-card .asq-logo { width: 64px; height: 64px; margin: 0 auto 12px; }
+.auth-company { color: var(--navy); text-align: center; font-size: 13px; font-weight: 700; line-height: 1.7; margin: 0 0 18px; }
+.auth-card > .panel-kicker { text-align: center; color: var(--blue); }
+.auth-card h1 { color: var(--navy); }
+.toast { background: var(--navy); }
+
+/* Full application name, including narrow sidebar layouts. */
+.brand > div { min-width: 0; }
+.brand-name { font-size: 15px; line-height: 1.4; overflow-wrap: normal; }
+.brand-sub { margin-top: 4px; }
+.auth-card > .panel-kicker { letter-spacing: .03em; line-height: 1.6; }
+
+.sidebar::-webkit-scrollbar-thumb:hover { background: #7c9bb8; }
+
+/* Bilingual Midad identity; the Arabic name includes a kasra under meem. */
+.app-wordmark { display: flex; align-items: baseline; gap: 6px; direction: ltr; unicode-bidi: isolate; }
+.brand-name.app-wordmark { font-size: 17px; line-height: 1.8; white-space: nowrap; }
+.app-wordmark [lang=ar] { font-size: 1.15em; }
+.app-wordmark [aria-hidden] { font-weight: 400; opacity: .65; }
+.brand-sub { font-size: 10px; line-height: 1.5; letter-spacing: .015em; }
+.auth-wordmark { justify-content: center; color: var(--navy); font-weight: 800; font-size: 25px; margin: 4px 0 6px; line-height: 1.8; }
+.auth-brand-sub { color: var(--blue); text-align: center; font-size: 12px; line-height: 1.6; margin: 0 0 22px; }
