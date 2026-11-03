@@ -4,7 +4,51 @@
 
 A bilingual Arabic/English inventory operations application for monitoring branch stock, reviewing sales, balancing replenishment and tracking expected supply. Built with Node.js, Express, Supabase and a browser-based dashboard.
 
-![MEDAD dashboard](public-preview.png)
+## Product tour
+
+Screenshots show the running application after its data has loaded, using the project's demonstration dataset. Click any image to inspect it at full size.
+
+### Overview
+
+Branch and product counts, stock-risk indicators, open transfers and network health.
+
+![MEDAD overview with loaded inventory metrics](docs/screenshots/01-overview.jpg)
+
+### Sales reports
+
+Monthly-period sales totals, daily averages and comparison with the previous period.
+
+![Sales report metrics and daily trend](docs/screenshots/02-sales-reports.jpg)
+
+### Product and category analysis
+
+Interactive rankings of the strongest products and category sales mix.
+
+![Top-selling products and category distribution](docs/screenshots/03-sales-analysis.jpg)
+
+### Central warehouse
+
+Current, reserved and available balances by product.
+
+![Central warehouse stock balances](docs/screenshots/04-warehouse.jpg)
+
+### Branch inventory
+
+Stock on hand, recent sales, stock cover and replenishment indicators. This example filters to healthy stock.
+
+![Branch inventory health and quantities](docs/screenshots/05-inventory-health.jpg)
+
+### Product Insights
+
+Available stock, days of cover, open incoming quantities and a reviewable replenishment recommendation.
+
+![Product Insights and replenishment recommendation](docs/screenshots/06-product-insights.jpg)
+
+### Transfer movements
+
+Multi-product transfer quantities, priorities and workflow states from the request register.
+
+![Transfer requests and stock movement workflow](docs/screenshots/07-transfer-movements.jpg)
 
 ## Features
 
